@@ -1,8 +1,11 @@
-node_modules
-*.test.js
+src/
+test/
+coverage/
+.github/
+
 .env
 .env.sample
-coverage
-*.lcov
-*.yml
-.github
+tsconfig.json
+
+yarn-error.log
+*.tgz

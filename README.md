@@ -1,79 +1,121 @@
-# NetSuite - SuiteTalk REST Web Services
+# Netsuite API Client
 
-[![NPM](https://nodei.co/npm/netsuite-rest.png)](https://www.npmjs.com/package/netsuite-rest)
+[![Node.js CI](https://github.com/julbrs/netsuite-api-client/actions/workflows/node.js.yml/badge.svg)](https://github.com/julbrs/netsuite-api-client/actions/workflows/node.js.yml) [![npm version](https://badge.fury.io/js/netsuite-api-client.svg)](https://www.npmjs.com/package/netsuite-api-client) [![downloads](https://img.shields.io/npm/dm/netsuite-api-client.svg)](https://www.npmjs.com/package/netsuite-api-client)
 
-![Node.js CI](https://github.com/ehmad11/netsuite-rest/workflows/Node.js%20CI/badge.svg?branch=master) [![npm version](https://badge.fury.io/js/netsuite-rest.svg)](https://www.npmjs.com/package/netsuite-rest) [![downloads](https://img.shields.io/npm/dm/netsuite-rest.svg)](https://www.npmjs.com/package/netsuite-rest) [![Coverage Status](https://coveralls.io/repos/github/ehmad11/netsuite-rest/badge.svg?branch=master)](https://coveralls.io/github/ehmad11/netsuite-rest?branch=master) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fehmad11%2Fnetsuite-rest.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fehmad11%2Fnetsuite-rest?ref=badge_shield)
+Run REST calls and SuiteQL queries against NetSuite SuiteTalk WebServices.
 
-Make requests to SuiteTalk REST Web Services
+## Why this new package?
+
+This package is a fork & merge of popular Netsuite packages [netsuite-rest](https://www.npmjs.com/package/netsuite-rest) & [suiteql](https://www.npmjs.com/package/suiteql), see [here](https://github.com/ehmad11/netsuite-rest/issues/27#issuecomment-1751798730) for the motivation. This package is **ESM only**. It adds **types** thanks to TypeScript, and **more recent dependencies** to handle recent CVEs on `got` package mainly. It meant to be **actively supported** in the future.
+
+If you need to stay on **CommonJS**, you can still use [netsuite-rest](https://www.npmjs.com/package/netsuite-rest) or [suiteql](https://www.npmjs.com/package/suiteql) by [ehmad11](https://github.com/ehmad11)!
 
 # Installation
 
-    npm i netsuite-rest
+```
+npm i netsuite-api-client
+```
 
 ## Quick Start
 
 To set up TBA in Netsuite, see the help topic [Getting Started with Token-based Authentication](https://system.netsuite.com/app/help/helpcenter.nl?fid=section_4247337262.html).
 
-    var NsApiWrapper = require('netsuite-rest');
-    NsApi = new NsApiWrapper({
-    	consumer_key: 'consumer_key',
-    	consumer_secret_key: 'consumer_secret_key',
-    	token: 'token',
-    	token_secret: 'token_secret',
-    	realm: 'realm'
-    	//,base_url: 'base_url' // optional
-    });
+```ts
+import { NetsuiteApiClient } from "netsuite-api-client";
+const client = new NetsuiteApiClient({
+  consumer_key: process.env.consumer_key,
+  consumer_secret_key: process.env.consumer_secret_key,
+  token: process.env.token,
+  token_secret: process.env.token_secret,
+  realm: process.env.realm,
+  base_url: process.env.base_url,
+});
+```
 
-## Sample Requests
+## request
 
-All requests are [signed](https://system.netsuite.com/app/help/helpcenter.nl?fid=section_1534941088.html).
+### Test
 
-#### Test Request
+```ts
+client
+  .request({
+    path: "*",
+    method: "OPTIONS",
+  })
+  .then((response) => console.log(response))
+  .catch((err) => console.log(err));
+```
 
-    NsApi.request({
-        path: '*',
-        method: "OPTIONS"
-    })
-    .then(response => console.log(response))
-    .catch((err) => console.log(err));
+### GET
 
-#### GET Request:
+```ts
+client
+  .request({
+    path: "record/v1/customer/",
+  })
+  .then((response) => response.data)
+  .then((data) => console.log(data.links))
+  .catch((err) => console.log(err));
+```
 
-    NsApi.request({
-        path: 'record/v1/customer/'
-    })
-    .then(response => response.data)
-    .then(data => console.log(data.links))
-    .catch((err) => console.log(err));
+## query
 
-#### SuiteQL
+```ts
+query(string, (limit = 1000), (offset = 0));
+```
 
-> NOTE: If you are interested only in the SuiteQL, check [SuiteQL package](https://www.npmjs.com/package/suiteql) or view [source code](https://github.com/ehmad11/suiteql). SuiteQL class extends this class and can return promise or stream for large number of rows.
+- **string** - Select query to run
+- **limit** - Limit number of rows, max is 1000
+- **offset** - Rows to start from
 
-SuiteQL is a subservice of the query service. Following is an example to execute SuiteQL queries:
+This method returns with the promise support, response will be in JSON format
 
-    NsApi.request({
-        path: 'query/v1/suiteql?limit=5',
-        method: "POST",
-        body: `{
-    		"q":
-    		"SELECT
-    			id, companyName, email, dateCreated
-             FROM customer WHERE
-                dateCreated >= '01/01/2019'
-               	AND dateCreated < '01/01/2020'"
-    	}`
-    })
-    .then(response => console.log(response))
-    .catch((err) => console.log(err));
+### Example
+
+```ts
+const transactions = await client.query("select id from transaction", 10, 0);
+```
+
+## queryAll (Stream)
+
+When working on large number of rows, stream is handy
+
+```ts
+queryAll(string, (limit = 1000));
+```
+
+- **string** - Select query to run
+- **limit** - Limit number of rows, max is 1000
+
+### Example
+
+```ts
+const items = [];
+const st = client.queryAll(`
+        select
+            tranid, id from transaction
+        where
+            rownum <= 30
+    `);
+
+st.on("data", (data) => {
+  items.push(data);
+});
+
+st.on("end", () => {
+  console.log("stream ended");
+});
+```
 
 ## Response
 
-Requests are returned with promise support (`.then(...)`). HTTP response codes other than 2xx will cause the promise to be rejected.
+Requests are returned with promise support. HTTP response codes other than 2xx will cause the promise to be rejected.
 
 ## Metadata
 
-    NsApi.request({path: 'record/v1/metadata-catalog/'})
+```ts
+client.request({ path: "record/v1/metadata-catalog/" });
+```
 
 Record is the name of the service we are trying to access, v1 is the service version, and metadata-catalog is the sub-resource, that is, the record metadata. The response informs you through HATEOAS links about the possible mediaType flavor in which the response can be obtained.
 

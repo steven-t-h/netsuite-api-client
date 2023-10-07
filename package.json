@@ -1,35 +1,46 @@
 {
-  "name": "netsuite-rest",
-  "version": "1.1.0",
-  "description": "Make requests to Netsuite's SuiteTalk REST Web Services",
+  "name": "netsuite-api-client",
+  "version": "0.1.2",
+  "description": "Netsuite client for REST interface",
   "keywords": [
     "netsuite",
     "suitetalk",
     "rest",
     "web",
     "services",
-    "promise"
+    "promise",
+    "suiteql"
   ],
-  "author": "Muhammad Ahmed <a@ehmad11.com> (https://ehmad11.com/)",
-  "homepage": "https://github.com/ehmad11/netsuite-rest#readme",
-  "bugs": "https://github.com/ehmad11/netsuite-rest/issues",
-  "main": "netsuite-rest.js",
-  "dependencies": {
-    "got": "^11.8.5",
-    "oauth-1.0a": "^2.2.6"
+  "type": "module",
+  "author": "Julien Bras <julienbras@sidoine.org>",
+  "homepage": "https://github.com/julbrs/netsuite-api-client#readme",
+  "bugs": "https://github.com/julbrs/netsuite-api-client/issues",
+  "exports": {
+    ".": "./dist/index.js",
+    "./types": "./dist/types.js"
+  },
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build --clean && tsc",
+    "test": "vitest",
+    "coverage": "vitest --coverage",
+    "prepublishOnly": "yarn build"
   },
   "devDependencies": {
-    "coveralls": "^3.1.1",
-    "dotenv": "^10.0.0",
-    "jest": "^26.6.3"
+    "@tsconfig/node18": "^18.2.2",
+    "@types/got": "^9.6.12",
+    "@vitest/coverage-v8": "^0.34.6",
+    "dotenv": "^16.3.1",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.6"
   },
-  "scripts": {
-    "test": "jest --coverage",
-    "test-cov": "jest --coverage && cat ./coverage/lcov.info | coveralls"
+  "dependencies": {
+    "got": "^13.0.0",
+    "oauth-1.0a": "^2.2.6"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ehmad11/netsuite-rest.git"
+    "url": "https://github.com/julbrs/netsuite-api-client.git"
   },
   "license": "MIT"
 }

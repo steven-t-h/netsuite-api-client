@@ -1,13 +1,23 @@
-const dotenv = require("dotenv").config();
-var NsApiWrapper = require("./netsuite-rest.js");
+import "dotenv/config";
+import NetsuiteApiClient from "../src/netsuite-rest";
+import { describe, expect, test, beforeAll, afterAll, it } from "vitest";
 
 describe("Netsuite Rest Webservices", () => {
-  jest.setTimeout(10000);
-  let NsApi;
-  let NsApiBaseUrl;
+  let NsApi: NetsuiteApiClient;
+  let NsApiBaseUrl: NetsuiteApiClient;
 
   beforeAll(async () => {
-    NsApi = new NsApiWrapper({
+    if (
+      process.env.consumer_key == undefined ||
+      process.env.consumer_secret_key == undefined ||
+      process.env.token == undefined ||
+      process.env.token_secret == undefined ||
+      process.env.realm == undefined
+    ) {
+      throw new Error("Please create a `.env` file based on `.env.sample`");
+    }
+
+    NsApi = new NetsuiteApiClient({
       consumer_key: process.env.consumer_key,
       consumer_secret_key: process.env.consumer_secret_key,
       token: process.env.token,
@@ -16,7 +26,7 @@ describe("Netsuite Rest Webservices", () => {
     });
 
     // with base_url
-    NsApiBaseUrl = new NsApiWrapper({
+    NsApiBaseUrl = new NetsuiteApiClient({
       consumer_key: process.env.consumer_key,
       consumer_secret_key: process.env.consumer_secret_key,
       token: process.env.token,
@@ -37,66 +47,52 @@ describe("Netsuite Rest Webservices", () => {
     expect(NsApi).toBeDefined();
   });
 
-  test("should make test request", () => {
+  test("should make test request", async () => {
     expect.assertions(1);
-    return NsApi.request({
+    const response = await NsApi.request({
       method: "OPTIONS",
-    })
-      .then((response) => expect(response.statusCode).toEqual(204))
-      .catch(() => {
-        console.log("Test request failed.");
-      });
+    });
+    expect(response.statusCode).toEqual(204);
   });
 
-  test("should make GET request - GET Customers", () => {
+  test("should make GET request - GET Customers", async () => {
     expect.assertions(1);
-    return NsApi.request({
+    const response = await NsApi.request({
       path: "record/v1/customer/",
-    })
-      .then((response) => expect(response.statusCode).toEqual(200))
-      .catch(() => {
-        console.log("GET request failed.");
-      });
+    });
+    expect(response.statusCode).toEqual(200);
   });
 
-  test("should make POST request - SuiteQL Query", () => {
+  test("should make POST request - SuiteQL Query", async () => {
     expect.assertions(1);
-    return NsApi.request({
+    const response = await NsApi.request({
       path: "query/v1/suiteql?limit=5",
       method: "POST",
       body: `{
                    "q": "SELECT id, companyName, email, dateCreated FROM customer WHERE dateCreated >= '01/01/2019' AND dateCreated < '01/01/2020'"
                 }`,
-    })
-      .then((response) => expect(response.statusCode).toEqual(200))
-      .catch(() => {
-        console.log("POST request failed.");
-      });
+    });
+    expect(response.statusCode).toEqual(200);
   });
 
-  test("should work with base_url", () => {
+  test("should work with base_url", async () => {
     expect.assertions(2);
     expect(process.env.base_url).toBeDefined();
-    return NsApiBaseUrl.request({
+
+    const response = await NsApiBaseUrl.request({
       method: "OPTIONS",
-    })
-      .then((response) => expect(response.statusCode).toEqual(204))
-      .catch(() => {
-        console.log("Test request failed.");
-      });
+    });
+    expect(response.statusCode).toEqual(204);
   });
 
-  test("should work with additional headers", () => {
+  test("should work with additional headers", async () => {
     expect.assertions(1);
-    return NsApi.request({
+    const response = await NsApi.request({
       method: "OPTIONS",
       heads: {
         foo: "foo",
       },
-    })
-      .then((response) => expect(response.statusCode).toEqual(204))
-      .catch(() => {
-        console.log("Test request failed.");
-      });
+    });
+    expect(response.statusCode).toEqual(204);
   });
 });
