@@ -111,6 +111,12 @@ st.on("end", () => {
 
 Requests are returned with promise support. HTTP response codes other than 2xx will cause the promise to be rejected.
 
+The Netsuite error will be preserved in the error message, so you don't have to read the got `HttpError` ! For example:
+
+```
+Invalid search query. Detailed unprocessed description follows. Search error occurred: Unknown identifier 'not_existing_field'. Available identifiers are: {customer=customer}
+```
+
 ## Metadata
 
 ```ts

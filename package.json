@@ -16,8 +16,7 @@
   "homepage": "https://github.com/julbrs/netsuite-api-client#readme",
   "bugs": "https://github.com/julbrs/netsuite-api-client/issues",
   "exports": {
-    ".": "./dist/index.js",
-    "./types": "./dist/types.js"
+    ".": "./dist/index.js"
   },
   "types": "dist/index.d.ts",
   "scripts": {

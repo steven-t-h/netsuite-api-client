@@ -1,6 +1,6 @@
 import OAuth from "oauth-1.0a";
 import crypto from "crypto";
-import got, { OptionsOfTextResponseBody } from "got";
+import got, { HTTPError, OptionsOfTextResponseBody } from "got";
 import { Readable } from "stream";
 import {
   NetsuiteOptions,
@@ -8,6 +8,7 @@ import {
   NetsuiteRequestOptions,
   NetsuiteResponse,
 } from "./types.js";
+import { NetsuiteError } from "./errors.js";
 
 export default class NetsuiteApiClient {
   consumer_key: string;
@@ -69,7 +70,7 @@ export default class NetsuiteApiClient {
    * @param opts
    * @returns
    */
-  public request(opts: NetsuiteRequestOptions) {
+  public async request(opts: NetsuiteRequestOptions) {
     const { path = "*", method = "GET", body = "", heads = {} } = opts;
 
     // Setup the Request URI
@@ -106,8 +107,15 @@ export default class NetsuiteApiClient {
       options.body = body;
       options.headers!.prefer = "transient";
     }
-
-    return got(uri, options) as unknown as Promise<NetsuiteResponse>;
+    try {
+      const response = await got(uri, options);
+      return response as unknown as Promise<NetsuiteResponse>;
+    } catch (e) {
+      if (e instanceof HTTPError) {
+        throw new NetsuiteError(e);
+      }
+      throw e;
+    }
   }
 
   /**
@@ -135,15 +143,13 @@ export default class NetsuiteApiClient {
     query = query.replace(/\t/g, " ");
     query = query.replace(/\r?\n|\r/gm, "");
     let bodyContent = `{"q": "${query}" }`;
-
-    await this.request({
+    const response = await this.request({
       path: `query/v1/suiteql?limit=${limit}&offset=${offset}`,
       method: "POST",
       body: bodyContent,
-    }).then((response) => {
-      queryResult.items = response.body.items;
-      queryResult.hasMore = response.body.hasMore;
     });
+    queryResult.items = response.body.items;
+    queryResult.hasMore = response.body.hasMore;
     return queryResult;
   }
 
