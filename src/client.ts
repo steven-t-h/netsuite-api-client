@@ -45,10 +45,7 @@ export default class NetsuiteApiClient {
       realm: this.realm,
       signature_method: this.algorithm,
       hash_function(base_string, key) {
-        return crypto
-          .createHmac("sha256", key)
-          .update(base_string)
-          .digest("base64");
+        return crypto.createHmac("sha256", key).update(base_string).digest("base64");
       },
     });
     return oauth.toHeader(
@@ -88,16 +85,6 @@ export default class NetsuiteApiClient {
       headers: this.getAuthorizationHeader(uri, method),
       throwHttpErrors: true,
       decompress: true,
-      hooks: {
-        afterResponse: [
-          (response) => {
-            if (typeof response.body === "string" && response.body.length > 0) {
-              response.body = JSON.parse(response.body);
-            }
-            return response;
-          },
-        ],
-      },
     } as OptionsOfTextResponseBody;
 
     if (Object.keys(heads).length > 0) {
@@ -109,7 +96,10 @@ export default class NetsuiteApiClient {
     }
     try {
       const response = await got(uri, options);
-      return response as unknown as Promise<NetsuiteResponse>;
+      return {
+        ...response,
+        data: response.body ? JSON.parse(response.body) : null,
+      } as NetsuiteResponse;
     } catch (e) {
       if (e instanceof HTTPError) {
         throw new NetsuiteError(e);
@@ -148,8 +138,8 @@ export default class NetsuiteApiClient {
       method: "POST",
       body: bodyContent,
     });
-    queryResult.items = response.body.items;
-    queryResult.hasMore = response.body.hasMore;
+    queryResult.items = response.data.items;
+    queryResult.hasMore = response.data.hasMore;
     return queryResult;
   }
 

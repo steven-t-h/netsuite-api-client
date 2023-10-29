@@ -54,7 +54,7 @@ describe("Test request method", () => {
   });
 
   it("should make POST request - SuiteQL Query", async () => {
-    expect.assertions(1);
+    expect.assertions(4);
     const response = await client.request({
       path: "query/v1/suiteql?limit=5",
       method: "POST",
@@ -63,6 +63,9 @@ describe("Test request method", () => {
                 }`,
     });
     expect(response.statusCode).toEqual(200);
+    expect(response.data).toBeDefined();
+    expect(response.data.items).toBeDefined();
+    expect(response.data.count).toBeDefined();
   });
 
   it("should work with base_url", async () => {
@@ -125,8 +128,6 @@ describe("Test request method", () => {
         path: "record/v1/customer",
         body: JSON.stringify({}),
       })
-    ).rejects.toThrowError(
-      "Error while accessing a resource. Please enter value(s) for: "
-    );
+    ).rejects.toThrowError("Error while accessing a resource. Please enter value(s) for: ");
   });
 });

@@ -13,8 +13,13 @@ type NetsuiteBodyError = {
 
 export class NetsuiteError extends Error {
   constructor(httpError: HTTPError) {
-    const body = httpError?.response?.body as NetsuiteBodyError;
-    const text = body["o:errorDetails"][0]?.detail;
-    super(text || httpError.message);
+    try {
+      const body = httpError?.response?.body;
+      const data = JSON.parse(body as string) as NetsuiteBodyError;
+      const text = data["o:errorDetails"][0].detail;
+      super(text || httpError.message);
+    } catch (e) {
+      super(httpError.message);
+    }
   }
 }
