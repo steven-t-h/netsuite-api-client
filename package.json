@@ -1,6 +1,6 @@
 {
   "name": "netsuite-api-client",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "Netsuite client for REST interface",
   "keywords": [
     "netsuite",
