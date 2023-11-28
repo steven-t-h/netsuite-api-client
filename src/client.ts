@@ -98,6 +98,7 @@ export default class NetsuiteApiClient {
       const response = await got(uri, options);
       return {
         ...response,
+        headers: response.headers,
         data: response.body ? JSON.parse(response.body) : null,
       } as NetsuiteResponse;
     } catch (e) {

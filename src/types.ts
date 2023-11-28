@@ -16,6 +16,7 @@ export type NetsuiteRequestOptions = {
 
 export type NetsuiteResponse = {
   statusCode: number;
+  headers: any;
   data: any;
 };
 
