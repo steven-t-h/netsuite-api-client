@@ -46,11 +46,46 @@ describe("Test request method", () => {
   });
 
   it("should make GET request - GET Customers", async () => {
-    expect.assertions(1);
+    expect.assertions(4);
     const response = await client.request({
       path: "record/v1/customer/",
     });
     expect(response.statusCode).toEqual(200);
+    expect(response.data).toBeDefined();
+    expect(response.data.items).toBeDefined();
+    expect(response.data.count).toBeDefined();
+  });
+
+  it("should make POST request - POST Customers", async () => {
+    const response = await client.request({
+      path: "record/v1/customer/",
+      method: "POST",
+      body: JSON.stringify({
+        entityStatus: 6,
+        firstName: "firstName",
+        lastName: "lastName",
+        subsidiary: "1",
+        companyName: "netsuite-api-client-integration-test",
+      }),
+    });
+
+    expect(response.statusCode).toEqual(204);
+    expect(response.data).toBeDefined();
+    expect(response.data).toBeNull();
+    expect(response.headers.location).toBeDefined();
+
+    const location = response.headers.location as string;
+
+    // extract id from location string
+    const id = location.split("/").pop();
+
+    // delete the created company
+    const responseDelete = await client.request({
+      path: `record/v1/customer/${id}`,
+      method: "DELETE",
+    });
+
+    expect(responseDelete.statusCode).toEqual(204);
   });
 
   it("should make POST request - SuiteQL Query", async () => {
