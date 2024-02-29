@@ -16,7 +16,7 @@ export type NetsuiteRequestOptions = {
 
 export type NetsuiteResponse = {
   statusCode: number;
-  headers: any;
+  headers: NodeJS.Dict<string | string[]>;
   data: any;
 };
 
