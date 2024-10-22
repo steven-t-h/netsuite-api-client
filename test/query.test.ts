@@ -83,4 +83,17 @@ describe("Test query and queryAll method", () => {
         done();
       });
     }));
+
+  it("it should throw error if queryAll result in error", () =>
+    new Promise<void>((done) => {
+      expect.assertions(1);
+      let items: any[] = [];
+      let st = client.queryAll(
+        "select tranid, id from transactiontablethatdoesnotexist"
+      );
+      st.on("error", (error) => {
+        expect(error).toBeDefined();
+        done();
+      });
+    }));
 });

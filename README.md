@@ -105,6 +105,10 @@ st.on("data", (data) => {
 st.on("end", () => {
   console.log("stream ended");
 });
+
+st.on("error", (err) => {
+  console.log(err);
+});
 ```
 
 ## Response
