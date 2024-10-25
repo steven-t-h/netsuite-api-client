@@ -1,6 +1,6 @@
 name: Node.js CI
 
-on: [push, pull_request]
+on: [pull_request]
 env:
   CI: true
   consumer_secret_key: ${{secrets.consumer_secret_key}}
