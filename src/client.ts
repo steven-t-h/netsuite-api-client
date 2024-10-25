@@ -157,14 +157,18 @@ export default class NetsuiteApiClient {
     });
     let offset = 0;
     const getNextPage = async () => {
-      let hasMore = true;
-      while (hasMore === true) {
-        let sqlResult = await this.query(query, limit, offset);
-        sqlResult.items.forEach((item) => stream.push(item));
-        hasMore = sqlResult.hasMore;
-        offset = offset + limit;
+      try {
+        let hasMore = true;
+        while (hasMore === true) {
+          let sqlResult = await this.query(query, limit, offset);
+          sqlResult.items.forEach((item) => stream.push(item));
+          hasMore = sqlResult.hasMore;
+          offset = offset + limit;
+        }
+        stream.push(null);
+      } catch (error) {
+        stream.emit('error', error);
       }
-      stream.push(null);
     };
     getNextPage();
     return stream;
