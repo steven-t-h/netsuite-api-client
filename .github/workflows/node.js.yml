@@ -1,6 +1,8 @@
 name: Node.js CI
 
-on: [pull_request]
+on:
+  pull_request:
+
 env:
   CI: true
   consumer_secret_key: ${{secrets.consumer_secret_key}}
@@ -8,25 +10,26 @@ env:
 
 jobs:
   test:
-    name: Node ${{ matrix.node }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: false
       matrix:
-        node: [18]
-        os: [ubuntu-latest]
+        node: [20]
 
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - name: Set Node.js version
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+          cache: "pnpm"
 
-      - name: Install npm dependencies
+      - name: Install dependencies
         run: pnpm install
 
       - name: Run tests
