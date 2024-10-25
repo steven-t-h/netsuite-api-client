@@ -3,12 +3,12 @@ name: Node.js CI
 on: [push, pull_request]
 env:
   CI: true
-  consumer_key: ${{secrets.consumer_key}}
+  consumer_key: ${{env.consumer_key}}
   consumer_secret_key: ${{secrets.consumer_secret_key}}
-  token: ${{secrets.token}}
+  token: ${{env.token}}
   token_secret: ${{secrets.token_secret}}
-  realm: ${{secrets.realm}}
-  base_url: ${{secrets.base_url}}
+  realm: ${{env.realm}}
+  base_url: ${{env.base_url}}
 
 jobs:
   test:
