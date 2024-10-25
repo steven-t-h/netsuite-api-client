@@ -3,12 +3,8 @@ name: Node.js CI
 on: [push, pull_request]
 env:
   CI: true
-  consumer_key: ${{env.consumer_key}}
   consumer_secret_key: ${{secrets.consumer_secret_key}}
-  token: ${{env.token}}
   token_secret: ${{secrets.token_secret}}
-  realm: ${{env.realm}}
-  base_url: ${{env.base_url}}
 
 jobs:
   test:
@@ -31,7 +27,7 @@ jobs:
           node-version: ${{ matrix.node }}
 
       - name: Install npm dependencies
-        run: yarn
+        run: pnpm install
 
       - name: Run tests
-        run: yarn coverage
+        run: pnpm coverage
