@@ -5,7 +5,11 @@ on:
 
 env:
   CI: true
+  realm: ${{vars.realm}}
+  base_url: ${{vars.base_url}}
+  consumer_key: ${{vars.consumer_key}}
   consumer_secret_key: ${{secrets.consumer_secret_key}}
+  token: ${{vars.token}}
   token_secret: ${{secrets.token_secret}}
 
 jobs:
