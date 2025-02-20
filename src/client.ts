@@ -33,10 +33,11 @@ export default class NetsuiteApiClient {
 
   /**
    * Retrieve the Authorization Header
-   * @param options
    * @returns
+   * @param url
+   * @param method
    */
-  getAuthorizationHeader(url: string, method: string) {
+  getAuthorizationHeader(url: string, method: string): { [key: string]: string } {
     const oauth = new OAuth({
       consumer: {
         key: this.consumer_key,
