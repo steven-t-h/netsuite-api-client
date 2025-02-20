@@ -9,6 +9,7 @@ import {
   NetsuiteResponse,
 } from "./types.js";
 import { NetsuiteError } from "./errors.js";
+import {removeLeadingSlash, removeTrailingSlash} from "./utils.js";
 
 export default class NetsuiteApiClient {
   consumer_key: string;
@@ -28,7 +29,7 @@ export default class NetsuiteApiClient {
     this.version = "1.0";
     this.algorithm = "HMAC-SHA256";
     this.realm = options.realm;
-    this.base_url = options.base_url;
+    this.base_url = options.base_url ? removeTrailingSlash(options.base_url) : undefined;
   }
 
   /**
@@ -70,15 +71,16 @@ export default class NetsuiteApiClient {
    */
   public async request(opts: NetsuiteRequestOptions) {
     const { path = "*", method = "GET", body = "", heads = {} } = opts;
-
-    // Setup the Request URI
+    const cleanPath = removeLeadingSlash(path);
+    // Set up the Request URI
     let uri;
-    if (this.base_url) uri = `${this.base_url}/services/rest/${path}`;
-    else {
+    if (this.base_url) {
+        uri = `${this.base_url}/services/rest/${cleanPath}`
+    } else {
       // as suggested by dylbarne in #15: sanitize url to enhance overall usability
       uri = `https://${this.realm
         .toLowerCase()
-        .replace("_", "-")}.suitetalk.api.netsuite.com/services/rest/${path}`;
+        .replace("_", "-")}.suitetalk.api.netsuite.com/services/rest/${cleanPath}`;
     }
 
     const options = {
