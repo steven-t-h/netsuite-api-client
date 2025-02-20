@@ -144,8 +144,6 @@ describe("Test request method", () => {
         path: "record/v1/bad-path",
       })
     ).rejects.toThrowError("Record type 'bad-path' does not exist");
-  }, {
-    timeout: 10000,
   });
 
   it("should reject with meaningful error if bad object", async () => {
