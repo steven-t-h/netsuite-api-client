@@ -9,7 +9,7 @@ export type NetsuiteOptions = {
 
 export type NetsuiteRequestOptions = {
   path?: string;
-  method?: string;
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH" | "HEAD" | "OPTIONS" | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'options';
   body?: any;
   heads?: any;
 };
