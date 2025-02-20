@@ -13,8 +13,8 @@ describe("Test request method", () => {
       process.env.token == undefined ||
       process.env.token_secret == undefined ||
       process.env.realm == undefined ||
-      process.env.base_url == undefined ||
-      process.env.restlet_url == undefined
+      process.env.base_url == undefined
+      // || process.env.restlet_url == undefined
     ) {
       throw new Error("Please create a `.env` file based on `.env.sample`");
     }
