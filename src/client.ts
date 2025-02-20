@@ -70,17 +70,20 @@ export default class NetsuiteApiClient {
    * @returns
    */
   public async request(opts: NetsuiteRequestOptions) {
-    const { path = "*", method = "GET", body = "", heads = {} } = opts;
+    const { path = "*", method = "GET", body = "", heads = {}, restletUrl } = opts;
     const cleanPath = removeLeadingSlash(path);
     // Set up the Request URI
-    let uri;
-    if (this.base_url) {
-        uri = `${this.base_url}/services/rest/${cleanPath}`
-    } else {
-      // as suggested by dylbarne in #15: sanitize url to enhance overall usability
-      uri = `https://${this.realm
+
+    // as suggested by dylbarne in #15: sanitize url to enhance overall usability
+    let uri = `https://${this.realm
         .toLowerCase()
         .replace("_", "-")}.suitetalk.api.netsuite.com/services/rest/${cleanPath}`;
+    if (this.base_url) {
+        uri = `${this.base_url}/services/rest/${cleanPath}`
+    }
+    // if restletUrl is provided, use it instead of the default uri
+    if (restletUrl) {
+      uri = restletUrl;
     }
 
     const options = {
